@@ -65,8 +65,8 @@ export default function PokemonComponent(props: Props) {
                 
                 <Col>
                     <Card className="border-primary border-3">
-                        <Card.Header className="bg-gradient-primary text-white text-center">
-                            <h4>⚔️ Battle Power Stats ⚔️</h4>
+                        <Card.Header className="bg-gradient-primary text-black text-center">
+                            <h4 >⚔️ Battle Power Stats ⚔️</h4>
                         </Card.Header>
                         <Card.Body className="bg-light">
                             <Row>
@@ -93,7 +93,7 @@ export default function PokemonComponent(props: Props) {
             <Row>
                 <Col>
                     <Card className="border-info border-3">
-                        <Card.Header className="bg-info text-white text-center">🎭 Pokémon Types 🎭</Card.Header>
+                        <Card.Header className="bg-info text-black text-center">Pokémon Types</Card.Header>
                         <ListGroup variant="flush">
                             {pokemon.pokemonType.map((type, index) => (
                                 <ListGroup.Item key={index} className="d-flex justify-content-between align-items-center bg-light">
@@ -107,7 +107,7 @@ export default function PokemonComponent(props: Props) {
                 
                 <Col>
                     <Card className="border-success border-3">
-                        <Card.Header className="bg-success text-white text-center">🔄 Evolution Journey 🔄</Card.Header>
+                        <Card.Header className="bg-success text-black text-center">🔄 Evolution Journey 🔄</Card.Header>
                         <ListGroup variant="flush">
                             {pokemon.evolutionFamily.map((evolution, index) => (
                                 <ListGroup.Item key={index} className="d-flex justify-content-between align-items-center bg-light">
