@@ -5,7 +5,7 @@ import { Badge } from "react-bootstrap";
 
 
 interface PokemonCardCompProps {
-   pokemonTypes: String[];
+   pokemonTypes: string[];
 }
 
 
