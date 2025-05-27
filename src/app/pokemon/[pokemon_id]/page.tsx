@@ -8,9 +8,9 @@ import PokemonComponent from './pokemon';
 import PokeNavBar from '@/components/pokeNavBarComp';
 import React from 'react';
 
-// This type is used to get the pokemon id from the url path
+// Updated type for Next.js 15 - params is now a Promise
 type Params = {
-    params: { pokemon_id: string }
+    params: Promise<{ pokemon_id: string }>
 }
 
 // Next.js passes the url parts which are defined between square brackets [] 
@@ -19,9 +19,10 @@ type Params = {
 // In our case http://localhost:3000/pokemon/2 is the URL. 
 // Where the 2 is the [pokemon_id] and passed as a parameter.
 export default function PokemonPage({ params }: Params) {
-    //@ts-expect-error jhgj
-const { pokemon_id } = React.use(params);
-console.log(pokemon_id)
+    // Using React.use() to unwrap the Promise - this is correct for Next.js 15
+    const { pokemon_id } = React.use(params);
+    console.log(pokemon_id)
+    
     //pokemon - A constant state variable which stores the pokemon information and retains the data between renders.
     //setPokemon - A state setter function to update the variable and trigger React to render the component again.
     const [pokemon, setPokemon] = useState<Pokemon>();
@@ -54,7 +55,8 @@ console.log(pokemon_id)
                     pokemon ?
                         <PokemonComponent pokemon={pokemon}></PokemonComponent> :
                         <Image className='img-fluid mx-auto d-block rounded'
-                            src="https://cdn.dribbble.com/users/2805817/screenshots/13206178/media/6bd36939f8a01d4480cb1e08147e20f3.png" alt= "pokemonImage" />  :
+                            src="https://cdn.dribbble.com/users/2805817/screenshots/13206178/media/6bd36939f8a01d4480cb1e08147e20f3.png" 
+                            alt="pokemonImage" />  :
                     <Container>
                         <Row className="justify-content-md-center p-2">
                             <Spinner className='p-2' animation='border' role='status' />
