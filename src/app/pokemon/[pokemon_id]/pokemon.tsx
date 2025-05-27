@@ -1,5 +1,6 @@
 import Pokemon from "@/model/pokemon";
 import { Row, Col, Container, Image, ProgressBar, Card, ListGroup, Badge } from 'react-bootstrap';
+import PokemonTypeBadgeComp from "@/components/pokemonTypeBadgeComp";
 
 type Props = {
     pokemon: Pokemon;
@@ -66,7 +67,7 @@ export default function PokemonComponent(props: Props) {
                 <Col>
                     <Card className="border-primary border-3">
                         <Card.Header className="bg-gradient-primary text-black text-center">
-                            <h4 >⚔️ Battle Power Stats ⚔️</h4>
+                            <h4>⚔️ Battle Power Stats ⚔️</h4>
                         </Card.Header>
                         <Card.Body className="bg-light">
                             <Row>
@@ -94,14 +95,16 @@ export default function PokemonComponent(props: Props) {
                 <Col>
                     <Card className="border-info border-3">
                         <Card.Header className="bg-info text-black text-center">Pokémon Types</Card.Header>
-                        <ListGroup variant="flush">
-                            {pokemon.pokemonType.map((type, index) => (
-                                <ListGroup.Item key={index} className="d-flex justify-content-between align-items-center bg-light">
-                                    <span className="h5">{getTypeEmoji(type)} {type}</span>
-                                    <Badge bg="dark" className="h6">{type.toUpperCase()}</Badge>
-                                </ListGroup.Item>
-                            ))}
-                        </ListGroup>
+                        <Card.Body className="bg-light text-center">
+                            <div className="h4">
+                                {pokemon.pokemonType.map((type, index) => (
+                                    <span key={index} className="d-inline-block">
+                                        <span className="h3">{getTypeEmoji(type)}</span>
+                                        <PokemonTypeBadgeComp pokemonTypes={[type]} />
+                                    </span>
+                                ))}
+                            </div>
+                        </Card.Body>
                     </Card>
                 </Col>
                 
