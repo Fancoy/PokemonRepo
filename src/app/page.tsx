@@ -149,14 +149,6 @@ export default function Home() {
     }
   };
 
-  const handleFirstPage = () => {
-    if (selectedType) return;
-    
-    setPreviousPageTokens([]);
-    setCurrentPageToken(null);
-    fetchData();
-  };
-
   useEffect(() => {
     if (selectedType && !allPokemonsLoaded) {
       fetchAllPokemons();
@@ -174,14 +166,6 @@ export default function Home() {
             <Container className="mb-4">
               <Row>
                 <Col className="d-flex justify-content-center gap-2">
-                  <Button
-                    variant="outline-primary"
-                    onClick={handleFirstPage}
-                    disabled={loading || !currentPageToken}
-                  >
-                    First
-                  </Button>
-
                   <Button
                     variant="outline-primary"
                     onClick={handlePreviousPage}
