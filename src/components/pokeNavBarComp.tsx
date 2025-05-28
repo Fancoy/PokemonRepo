@@ -117,43 +117,7 @@ export default function PokeNavBarComp({ onTypeFilter, selectedType }: PokeNavBa
               {onTypeFilter && (
                 <>
                   <style jsx>{`
-                    .custom-dropdown .dropdown-menu {
-                      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-                      border: 2px solid #ffd700 !important;
-                      border-radius: 8px !important;
-                      padding: 8px 0 !important;
-                      box-shadow: 0 4px 15px rgba(0,0,0,0.3) !important;
-                      margin-top: 8px !important;
-                    }
                     
-                    .custom-dropdown .dropdown-item {
-                      background-color: transparent !important;
-                      color: #e0e0e0 !important;
-                      border: 1px solid transparent !important;
-                      margin: 2px 8px !important;
-                      border-radius: 6px !important;
-                      padding: 8px 16px !important;
-                      transition: all 0.3s ease !important;
-                    }
-                    
-                    .custom-dropdown .dropdown-item:hover {
-                      background-color: rgba(255, 255, 255, 0.1) !important;
-                      border-color: rgba(255, 215, 0, 0.5) !important;
-                      color: #ffd700 !important;
-                    }
-                    
-                    .custom-dropdown .dropdown-item.active-custom {
-                      background-color: rgba(255, 215, 0, 0.3) !important;
-                      color: #ffd700 !important;
-                      font-weight: bold !important;
-                      border: 1px solid #ffd700 !important;
-                    }
-                    
-                    .custom-dropdown .dropdown-divider {
-                      border-color: #ffd700 !important;
-                      margin: 8px 16px !important;
-                      opacity: 0.5 !important;
-                    }
                   `}</style>
                   
                   <NavDropdown 

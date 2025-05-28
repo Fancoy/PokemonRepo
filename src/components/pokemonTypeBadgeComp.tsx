@@ -1,95 +1,59 @@
 "use client";
 
-import { Badge } from "react-bootstrap";
-
 interface PokemonTypeBadgeCompProps {
    pokemonTypes: string[];
 }
 
 export default function PokemonTypeBadgeComp(props: PokemonTypeBadgeCompProps) {
    
-   const getTypeStyle = (pokemonType: string) => {
-       const typeStyles: { [key: string]: { bg?: string, style?: React.CSSProperties } } = {
-           'Water': { bg: 'primary' },
-           'Fire': { bg: 'danger' },
-           'Grass': { bg: 'success' },
-           'Electric': { bg: 'warning' },
-           'Normal': { bg: 'secondary' },
-           'Ice': { bg: 'info' },
-           'Fighting': { bg: 'danger' },
-           'Ground': { 
-               style: { 
-                   backgroundColor: '#8B4513', 
-                   color: 'white',
-                   border: 'none'
-               } 
-           },
-           'Flying': { bg: 'info' },
-           'Poison': { 
-               style: { 
-                   backgroundColor: '#8B3A9C', 
-                   color: 'white',
-                   border: 'none'
-               } 
-           },
-           'Psychic': { 
-               style: { 
-                   backgroundColor: '#9932CC', 
-                   color: 'white',
-                   border: 'none'
-               } 
-           },
-           'Bug': { bg: 'success' },
-           'Rock': { 
-               style: { 
-                   backgroundColor: '#696969', 
-                   color: 'white',
-                   border: 'none'
-               } 
-           },
-           'Ghost': { bg: 'dark' },
-           'Dragon': { bg: 'primary' },
-           'Dark': { bg: 'dark' },
-           'Steel': { bg: 'secondary' },
-           'Fairy': { 
-               style: { 
-                   backgroundColor: '#FF69B4', 
-                   color: 'white',
-                   border: 'none'
-               } 
-           }
+   const getTypeColor = (pokemonType: string): string => {
+       const typeColors: { [key: string]: string } = {
+           'Normal': '#A8A878',
+           'Fire': '#F08030',
+           'Water': '#6890F0',
+           'Electric': '#F8D030',
+           'Grass': '#78C850',
+           'Ice': '#98D8D8',
+           'Fighting': '#C03028',
+           'Poison': '#8b3a9c',
+           'Ground': '#8b4513',
+           'Flying': '#A890F0',
+           'Psychic': '#9932cc',
+           'Bug': '#A8B820',
+           'Rock': '#696969',
+           'Ghost': '#705898',
+           'Dragon': '#7038F8',
+           'Dark': '#705848',
+           'Steel': '#B8B8D0',
+           'Fairy': '#ff69b4'
        };
        
-       return typeStyles[pokemonType] || { bg: 'secondary' };
+       return typeColors[pokemonType] || '#68A090';
+   };
+
+   const getTextColor = (pokemonType: string): string => {
+       return ['Electric', 'Ice', 'Steel'].includes(pokemonType) ? 'black' : 'white';
    };
 
    return (
-       <span className="d-flex flex-wrap gap-1">
-           {props.pokemonTypes?.map((pokemonType, index) => {
-               const typeStyle = getTypeStyle(pokemonType);
-               
-               if (typeStyle.style) {
-                   return (
-                       <Badge 
-                           key={index} 
-                           style={typeStyle.style}
-                           className="me-1"
-                       >
-                           {pokemonType}
-                       </Badge>
-                   );
-               } else {
-                   return (
-                       <Badge 
-                           key={index} 
-                           bg={typeStyle.bg}
-                           className="me-1"
-                       >
-                           {pokemonType}
-                       </Badge>
-                   );
-               }
-           })}
-       </span>
+       <div className="d-flex flex-wrap gap-1">
+           {props.pokemonTypes?.map((pokemonType, index) => (
+               <div
+                   key={index}
+                   style={{
+                       backgroundColor: getTypeColor(pokemonType),
+                       color: getTextColor(pokemonType),
+                       fontSize: '12px',
+                       fontWeight: 'bold',
+                       textTransform: 'uppercase',
+                       borderRadius: '3px',
+                       marginRight: '3px'
+                       
+                   }}
+               >
+                   {pokemonType}
+               </div>
+           ))}
+       </div>
    );
 }
