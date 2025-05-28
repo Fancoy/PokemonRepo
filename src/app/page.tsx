@@ -7,109 +7,68 @@ import { Container, Row, Spinner, Col, Button } from "react-bootstrap";
 
 import { getPokemonTypes } from "@/utils/pokemonTypeUtils";
 
-interface PokemonListResponse {
-  items: PokemonCard[];
-  nextPage?: string;
-}
-
 export default function Home() {
   const [allPokemons, setAllPokemons] = useState<PokemonCard[]>([]);
   const [filteredPokemons, setFilteredPokemons] = useState<PokemonCard[]>([]);
+  const [displayedPokemons, setDisplayedPokemons] = useState<PokemonCard[]>([]);
   const [loading, setLoading] = useState(false);
-  const [nextPageToken, setNextPageToken] = useState<string | null>(null);
-  const [currentPageToken, setCurrentPageToken] = useState<string | null>(null);
-  const [previousPageTokens, setPreviousPageTokens] = useState<(string | null)[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
   const [selectedType, setSelectedType] = useState<string | null>(null);
-  const [allPokemonsLoaded, setAllPokemonsLoaded] = useState(false);
+  const [totalPages, setTotalPages] = useState(0);
+  
+  const POKEMON_PER_PAGE = 50;
 
-  const fetchAllPokemons = async () => {
+  const fetchPokemonsFromJson = async () => {
     setLoading(true);
     try {
-      let allPokemonData: PokemonCard[] = [];
-      let currentToken: string | null = null;
+      console.log('Attempting to fetch /pokemons.json...');
+      const response = await fetch('/pokemons.json');
+      console.log('Response status:', response.status, response.statusText);
       
-      do {
-        let url = '/api/pokemon';
-        if (currentToken) {
-          url += `?nextPage=${encodeURIComponent(currentToken)}`;
-        }
-
-        const resp = await fetch(url);
-        if (resp.ok) {
-          const response: PokemonListResponse = await resp.json();
-          allPokemonData = [...allPokemonData, ...response.items];
-          currentToken = response.nextPage || null;
-        } else {
-          break;
-        }
-      } while (currentToken);
-
-      setAllPokemons(allPokemonData);
-      setFilteredPokemons(allPokemonData);
-      setAllPokemonsLoaded(true);
-      console.log('Loaded all Pokemon:', allPokemonData.length);
+      if (response.ok) {
+        const pokemonData: PokemonCard[] = await response.json();
+        console.log('Loaded Pokemon from JSON:', pokemonData.length);
+        console.log('Sample Pokemon:', pokemonData[0]);
+        
+        setAllPokemons(pokemonData);
+        setFilteredPokemons(pokemonData);
+      } else {
+        console.error('Failed to fetch pokemons.json:', response.status, response.statusText);
+      }
     } catch (error) {
-      console.error('Error fetching all Pokemon:', error);
+      console.error('Error fetching Pokemon from JSON:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchData = async (pageToken?: string) => {
-    if (selectedType) {
-      return;
-    }
-
-    setLoading(true);
-    try {
-      let url = '/api/pokemon';
-      if (pageToken) {
-        url += `?nextPage=${encodeURIComponent(pageToken)}`;
-      }
-
-      const resp = await fetch(url);
-      if (resp.ok) {
-        const response: PokemonListResponse = await resp.json();
-        const pokemons: PokemonCard[] = response.items;
-        console.log(pokemons);
-        setFilteredPokemons(pokemons);
-        setNextPageToken(response.nextPage || null);
-        setCurrentPageToken(pageToken || null);
-      }
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
+  const updateDisplayedPokemons = (pokemons: PokemonCard[], page: number) => {
+    const startIndex = (page - 1) * POKEMON_PER_PAGE;
+    const endIndex = startIndex + POKEMON_PER_PAGE;
+    const paginatedPokemons = pokemons.slice(startIndex, endIndex);
+    
+    setDisplayedPokemons(paginatedPokemons);
+    setTotalPages(Math.ceil(pokemons.length / POKEMON_PER_PAGE));
   };
 
   useEffect(() => {
-    fetchData();
+    fetchPokemonsFromJson();
   }, []);
+
+  useEffect(() => {
+    if (filteredPokemons.length > 0) {
+      updateDisplayedPokemons(filteredPokemons, currentPage);
+    }
+  }, [filteredPokemons, currentPage]);
 
   const handleTypeFilter = (type: string | null) => {
     setSelectedType(type);
+    setCurrentPage(1); // Reset to first page when filtering
     
     if (type === null) {
-      if (allPokemonsLoaded && allPokemons.length > 0) {
-        const pageSize = 50;
-        setFilteredPokemons(allPokemons.slice(0, pageSize));
-        setPreviousPageTokens([]);
-        setCurrentPageToken(null);
-      } else {
-        fetchData();
-      }
+      setFilteredPokemons(allPokemons);
     } else {
-      if (!allPokemonsLoaded) {
-        fetchAllPokemons().then(() => {
-          filterPokemonsByType(type);
-        });
-      } else {
-        filterPokemonsByType(type);
-      }
-      setPreviousPageTokens([]);
-      setCurrentPageToken(null);
-      setNextPageToken(null);
+      filterPokemonsByType(type);
     }
   };
 
@@ -131,86 +90,113 @@ export default function Home() {
   };
 
   const handleNextPage = () => {
-    if (selectedType || !nextPageToken) return;
-    
-    setPreviousPageTokens(prev => [...prev, currentPageToken]);
-    fetchData(nextPageToken);
+    if (currentPage < totalPages) {
+      setCurrentPage(prev => prev + 1);
+    }
   };
 
   const handlePreviousPage = () => {
-    if (selectedType) return;
-    
-    if (previousPageTokens.length > 0) {
-      const previousToken = previousPageTokens[previousPageTokens.length - 1];
-      setPreviousPageTokens(prev => prev.slice(0, -1));
-      fetchData(previousToken || undefined);
-    } else {
-      fetchData();
+    if (currentPage > 1) {
+      setCurrentPage(prev => prev - 1);
     }
   };
 
-  useEffect(() => {
-    if (selectedType && !allPokemonsLoaded) {
-      fetchAllPokemons();
+  const handlePageJump = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
     }
-  }, [selectedType, allPokemonsLoaded]);
+  };
 
   return (
-    <>
-      <PokeNavBar onTypeFilter={handleTypeFilter} selectedType={selectedType} />
-      {filteredPokemons.length > 0 ? (
+    <div 
+      className="min-vh-100"
+      style={{
+        backgroundImage: 'url("/background.png")',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        backgroundAttachment: 'fixed'
+      }}
+    >
+      <div 
+        style={{
+          backgroundColor: 'rgba(255, 255, 255, 0.1)',
+          minHeight: '100vh'
+        }}
+      >
+        <PokeNavBar onTypeFilter={handleTypeFilter} selectedType={selectedType} />
+        {displayedPokemons.length > 0 ? (
         <>
-          <PokemonsComp pokemons={filteredPokemons}></PokemonsComp>
+          <PokemonsComp pokemons={displayedPokemons}></PokemonsComp>
           
-          {!selectedType && (
-            <Container className="mb-4">
-              <Row>
-                <Col className="d-flex justify-content-center gap-2">
-                  <Button
-                    variant="outline-primary"
-                    onClick={handlePreviousPage}
-                    disabled={loading || previousPageTokens.length === 0}
-                  >
-                    Previous
-                  </Button>
+          <Container className="mb-4">
+            <Row>
+              <Col className="d-flex justify-content-center gap-2 align-items-center">
+                <Button
+                  variant="outline-primary"
+                  onClick={handlePreviousPage}
+                  disabled={loading || currentPage === 1}
+                >
+                  Previous
+                </Button>
 
-                  <Button
-                    variant="primary"
-                    onClick={handleNextPage}
-                    disabled={loading || !nextPageToken}
-                  >
-                    Next
-                  </Button>
-                </Col>
-              </Row>
+                <span className="mx-3">
+                  Page {currentPage} of {totalPages}
+                </span>
 
+                <Button
+                  variant="primary"
+                  onClick={handleNextPage}
+                  disabled={loading || currentPage === totalPages}
+                >
+                  Next
+                </Button>
+              </Col>
+            </Row>
+
+            <Row className="mt-2">
+              <Col className="text-center">
+                <small className="text-muted">
+                  Showing {displayedPokemons.length} of {filteredPokemons.length} Pokemon
+                  {selectedType && ` (${selectedType}-type)`}
+                  {" • "}
+                  Page {currentPage} of {totalPages}
+                </small>
+              </Col>
+            </Row>
+
+            {/* Page number buttons for quick navigation */}
+            {totalPages > 1 && (
               <Row className="mt-2">
-                <Col className="text-center">
-                  <small className="text-muted">
-                    {filteredPokemons.length > 0 && (
-                      <>
-                        Showing {filteredPokemons.length} Pokemon
-                        {nextPageToken && " • More available"}
-                        {!nextPageToken && currentPageToken && " • Last page"}
-                      </>
-                    )}
-                  </small>
+                <Col className="d-flex justify-content-center gap-1 flex-wrap">
+                  {Array.from({ length: Math.min(totalPages, 10) }, (_, i) => {
+                    let pageNum;
+                    if (totalPages <= 10) {
+                      pageNum = i + 1;
+                    } else {
+                      // Show pages around current page
+                      const start = Math.max(1, currentPage - 4);
+                      const end = Math.min(totalPages, start + 9);
+                      pageNum = start + i;
+                      if (pageNum > end) return null;
+                    }
+                    
+                    return (
+                      <Button
+                        key={pageNum}
+                        variant={currentPage === pageNum ? "primary" : "outline-secondary"}
+                        size="sm"
+                        onClick={() => handlePageJump(pageNum)}
+                        disabled={loading}
+                      >
+                        {pageNum}
+                      </Button>
+                    );
+                  })}
                 </Col>
               </Row>
-            </Container>
-          )}
-
-          {selectedType && (
-            <Container className="mb-4">
-              <Row>
-                <Col className="text-center">
-                  <small className="text-muted">
-                    Showing {filteredPokemons.length} {selectedType}-type Pokemon
-                  </small>
-                </Col>
-              </Row>
-            </Container>
-          )}
+            )}
+          </Container>
         </>
       ) : loading ? (
         <Container>
@@ -231,8 +217,9 @@ export default function Home() {
               <p>No {selectedType}-type Pokemon available</p>
             </Row>
           )}
-        </Container>
-      )}
-    </>
+          </Container>
+        )}
+      </div>
+    </div>
   );
 }

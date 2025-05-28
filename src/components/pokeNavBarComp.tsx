@@ -13,7 +13,7 @@ export default function PokeNavBarComp({ onTypeFilter, selectedType }: PokeNavBa
   const pokemonTypes = [
     'Normal', 'Fire', 'Water', 'Electric', 'Grass', 'Ice',
     'Fighting', 'Poison', 'Ground', 'Flying', 'Psychic', 'Bug',
-    'Rock', 'Ghost', 'Dragon', 'Dark', 'Steel', 'Fairy'
+    'Rock', 'Ghost', 'Dragon', 'Steel', 'Fairy'
   ];
 
   const getCustomStyle = (type: string): React.CSSProperties => {
@@ -34,7 +34,6 @@ export default function PokeNavBarComp({ onTypeFilter, selectedType }: PokeNavBa
       'Bug': { backgroundColor: '#A8B820', color: 'white' },
       'Ghost': { backgroundColor: '#705898', color: 'white' },
       'Dragon': { backgroundColor: '#7038F8', color: 'white' },
-      'Dark': { backgroundColor: '#705848', color: 'white' },
       'Steel': { backgroundColor: '#B8B8D0', color: 'black' }
     };
     
